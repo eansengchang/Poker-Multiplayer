@@ -1,4 +1,4 @@
-const socket = io.connect('localhost:9321');
+const socket = io.connect('localhost:4400');
 
 socket.on('gameState', handleGameState);
 socket.on('winner', handleWinner);
@@ -142,14 +142,17 @@ function handleGameState(gameState) {
 
 function handleWinner(obj) {
   console.log(obj);
-  let { winner, handRanks } = obj;
-
-  let name = rankToName[handRanks[winner].rank];
+  let { winners, handRanks } = obj;
 
   console.log(currentGameState);
+  let winnerTxt = winners.map(
+    (winner) => `<br> Winner: ${winner} <br>
+  Hand: ${currentGameState.hands[winner]} with a ${
+      rankToName[handRanks[winner].rank]
+    }`
+  );
 
-  winnerInfo.innerHTML = `Winner: ${winner} <br>
-                          Hand: ${currentGameState.hands[winner]} with a ${name}`;
+  winnerInfo.innerHTML = winnerTxt;
 }
 
 function handleGameCode(gameCode) {

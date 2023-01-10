@@ -16,7 +16,7 @@ class Game {
     this.roundPlaying = false;
     this.gameStarted = false;
     this.gameStage = 0;
-    this.winner = null;
+    this.winners = [];
   }
 
   addPlayer(playerName) {
@@ -77,7 +77,7 @@ class Game {
     this.table = [];
     this.handRanks = {};
     this.gameStage = 0;
-    this.winner = null;
+    this.winners = [];
 
     //fix turn and turnArray because it is null now
     this.turnArray = Object.keys(this.players);
@@ -106,7 +106,7 @@ class Game {
 
     //check winner
     if (stillPlaying.length == 1) {
-      this.getWinner();
+      this.getWinners();
     }
 
     do {
@@ -124,7 +124,7 @@ class Game {
     }
 
     if (this.gameStage == 4) {
-      this.getWinner();
+      this.getWinners();
     }
   }
 
@@ -139,7 +139,7 @@ class Game {
     return true;
   }
 
-  getWinner() {
+  getWinners() {
     //array of player names playing
     let playersPlaying = Object.keys(this.players).filter((player) => {
       return this.players[player].folded == false;
@@ -154,6 +154,7 @@ class Game {
     //who won
     let winner = playersPlaying[0];
 
+    //get highest
     for (const player of playersPlaying) {
       if (
         Deck.firstRankHigher(this.handRanks[winner], this.handRanks[player])
@@ -162,15 +163,30 @@ class Game {
       }
     }
 
-    console.log(this.handRanks);
-    console.log(winner);
-
-    //give money
-    for (const [key, value] of Object.entries(this.players)) {
-      this.players[winner].money += value.bid;
+    //check if other winners
+    for (const player of playersPlaying) {
+      if (
+        this.handRanks[winner].rank == this.handRanks[player].rank &&
+        this.handRanks[winner].cardNumber == this.handRanks[player].cardNumber
+      ) {
+        this.winners.push(player);
+      }
     }
 
-    this.winner = winner;
+    console.log(this.handRanks);
+    console.log(this.winners);
+
+    //split money
+    let splitNum = this.winners.length;
+    let pot = 0;
+
+    for (const [key, value] of Object.entries(this.players)) {
+      pot += value.bid;
+    }
+
+    for (const winner of this.winners) {
+      this.players[winner].money += Math.floor(pot / splitNum);
+    }
 
     this.roundPlaying = false;
     //new round

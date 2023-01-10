@@ -63,7 +63,7 @@ io.on('connect', (socket) => {
       emitGameState(roomCode, gameInstance)
 
       emitWinner(roomCode, {
-        winner: gameInstance.winner,
+        winners: gameInstance.winners,
         handRanks: gameInstance.handRanks,
       });
     }
@@ -159,4 +159,4 @@ function emitWinner(roomCode, obj) {
   io.sockets.in(roomCode).emit('winner', obj);
 }
 
-io.listen(process.env.PORT || 9321);
+io.listen(process.env.PORT || 4400);
